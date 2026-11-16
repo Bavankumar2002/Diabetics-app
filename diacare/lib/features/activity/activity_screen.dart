@@ -91,6 +91,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
                       final steps = int.tryParse(stepsCtrl.text) ?? 0;
                       final dur = int.tryParse(durCtrl.text) ?? 20;
                       Navigator.pop(ctx);
@@ -101,11 +102,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
                         steps: steps,
                         durationMins: dur,
                       );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Activity recorded successfully'), backgroundColor: AppColors.success),
-                        );
-                      }
+                      if (!mounted) return;
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Activity recorded successfully'), backgroundColor: AppColors.success),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
@@ -188,7 +188,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                         trailing: Text(a.time, style: const TextStyle(fontSize: 12, color: AppColors.textMutedLight)),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
                 const SizedBox(height: 60),
               ],
@@ -223,7 +223,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.waterColor.withOpacity(0.12),
+                  color: AppColors.waterColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

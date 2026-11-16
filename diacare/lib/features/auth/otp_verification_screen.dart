@@ -224,9 +224,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withOpacity(0.7),
+                    color: AppColors.primaryLight.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [

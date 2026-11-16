@@ -110,12 +110,12 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            AppColors.primaryLight.withOpacity(0.8),
-                            AppColors.secondaryLight.withOpacity(0.5),
+                            AppColors.primaryLight.withValues(alpha: 0.8),
+                            AppColors.secondaryLight.withValues(alpha: 0.5),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
@@ -270,7 +270,7 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
               show: true,
               drawVerticalLine: false,
               getDrawingHorizontalLine: (_) => FlLine(
-                color: (isDark ? AppColors.borderDark : AppColors.borderLight).withOpacity(0.5),
+                color: (isDark ? AppColors.borderDark : AppColors.borderLight).withValues(alpha: 0.5),
                 strokeWidth: 1,
               ),
             ),
@@ -285,7 +285,7 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
                 isCurved: true,
                 color: AppColors.primary,
                 barWidth: 3,
-                belowBarData: BarAreaData(show: true, color: AppColors.primary.withOpacity(0.12)),
+                belowBarData: BarAreaData(show: true, color: AppColors.primary.withValues(alpha: 0.12)),
               ),
             ],
           ),

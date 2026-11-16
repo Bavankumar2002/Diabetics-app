@@ -78,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.primaryLight.withOpacity(0.5),
+              AppColors.primaryLight.withValues(alpha: 0.5),
               AppColors.backgroundLight,
             ],
           ),
@@ -98,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.35),
+                      color: AppColors.primary.withValues(alpha: 0.35),
                       blurRadius: 24,
                       offset: const Offset(0, 8),
                     ),

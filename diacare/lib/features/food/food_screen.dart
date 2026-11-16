@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/colors.dart';
 import '../../providers/food_provider.dart';
-import '../../models/food_model.dart';
 import '../../widgets/nutrient_progress_bar.dart';
 import 'meal_suggestions_screen.dart';
 
@@ -136,6 +135,7 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                                   trailing: IconButton(
                                     icon: const Icon(Icons.add_circle, color: AppColors.primary),
                                     onPressed: () async {
+                                      final messenger = ScaffoldMessenger.of(context);
                                       Navigator.pop(ctx);
                                       await foodProvider.logFoodItem(
                                         mealTime: currentSlot,
@@ -148,11 +148,10 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                                         fat: food.fat,
                                         fiber: food.fiber,
                                       );
-                                      if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Added ${food.name} to $currentSlot'), backgroundColor: AppColors.success),
-                                        );
-                                      }
+                                      if (!mounted) return;
+                                      messenger.showSnackBar(
+                                        SnackBar(content: Text('Added ${food.name} to $currentSlot'), backgroundColor: AppColors.success),
+                                      );
                                     },
                                   ),
                                 ),
@@ -302,15 +301,17 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                           consumed: (totals['protein'] ?? 0).toDouble(),
                           goal: (totals['protein_goal'] ?? 80).toDouble(),
                           progressColor: AppColors.proteinColor,
+                          isCompact: true,
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: NutrientProgressBar(
                           label: 'Carbohydrates',
                           consumed: (totals['carbs'] ?? 0).toDouble(),
                           goal: (totals['carbs_goal'] ?? 180).toDouble(),
                           progressColor: AppColors.carbsColor,
+                          isCompact: true,
                         ),
                       ),
                     ],
@@ -323,15 +324,17 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                           consumed: (totals['fat'] ?? 0).toDouble(),
                           goal: (totals['fat_goal'] ?? 60).toDouble(),
                           progressColor: AppColors.fatColor,
+                          isCompact: true,
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: NutrientProgressBar(
                           label: 'Fibre',
                           consumed: (totals['fiber'] ?? 0).toDouble(),
                           goal: (totals['fiber_goal'] ?? 30).toDouble(),
                           progressColor: AppColors.fiberColor,
+                          isCompact: true,
                         ),
                       ),
                     ],
@@ -388,7 +391,7 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.restaurant_outlined, size: 48, color: AppColors.textMutedLight.withOpacity(0.5)),
+                                      Icon(Icons.restaurant_outlined, size: 48, color: AppColors.textMutedLight.withValues(alpha: 0.5)),
                                       const SizedBox(height: 12),
                                       Text('No food logged for $slot yet.', style: const TextStyle(color: AppColors.textMutedLight)),
                                       const SizedBox(height: 8),

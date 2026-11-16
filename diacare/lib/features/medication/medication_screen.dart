@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/colors.dart';
 import '../../providers/medication_provider.dart';
-import '../../models/medication_model.dart';
 
 class MedicationScreen extends StatefulWidget {
   const MedicationScreen({super.key});
@@ -104,7 +103,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                   SwitchListTile(
                     title: const Text('Is this an Insulin dose?', style: TextStyle(fontWeight: FontWeight.w600)),
                     value: isInsulin,
-                    activeColor: AppColors.primary,
+                    activeThumbColor: AppColors.primary,
                     onChanged: (val) => setModalState(() => isInsulin = val),
                   ),
                   const SizedBox(height: 12),
@@ -116,6 +115,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (nameCtrl.text.trim().isEmpty) return;
+                      final messenger = ScaffoldMessenger.of(context);
                       Navigator.pop(ctx);
                       final medProvider = Provider.of<MedicationProvider>(context, listen: false);
                       await medProvider.addMedication(
@@ -126,11 +126,10 @@ class _MedicationScreenState extends State<MedicationScreen> {
                         reminderTime: reminderTime,
                         instructions: instructionCtrl.text.trim(),
                       );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Medication added successfully'), backgroundColor: AppColors.success),
-                        );
-                      }
+                      if (!mounted) return;
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Medication added successfully'), backgroundColor: AppColors.success),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
@@ -151,7 +150,6 @@ class _MedicationScreenState extends State<MedicationScreen> {
   @override
   Widget build(BuildContext context) {
     final med = Provider.of<MedicationProvider>(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -176,9 +174,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withOpacity(0.5),
+                    color: AppColors.primaryLight.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
                   child: const Row(
                     children: [
@@ -230,7 +228,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: (m.isInsulin ? AppColors.secondary : AppColors.purple).withOpacity(0.12),
+                                    color: (m.isInsulin ? AppColors.secondary : AppColors.purple).withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
@@ -308,7 +306,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
                 const SizedBox(height: 60),
               ],

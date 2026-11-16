@@ -1,17 +1,34 @@
 import 'package:flutter/foundation.dart';
 
 class ApiConstants {
-  // Configurable base URL
-  static String get baseUrl {
+  // Developer PC LAN IP on Wi-Fi router (192.168.1.49)
+  static const String defaultLocalIp = '192.168.1.49';
+  static String? _overrideHost;
+
+  static void setServerHost(String? host) {
+    if (host != null && host.trim().isNotEmpty) {
+      _overrideHost = host.trim();
+    } else {
+      _overrideHost = null;
+    }
+  }
+
+  static String get serverHost {
+    if (_overrideHost != null && _overrideHost!.isNotEmpty) {
+      return _overrideHost!;
+    }
     if (kIsWeb) {
-      return 'http://localhost/diabetics_app/backend';
+      return 'localhost';
     }
     if (defaultTargetPlatform == TargetPlatform.android) {
-      // 10.0.2.2 is the default Android emulator host alias for localhost
-      return 'http://10.0.2.2/diabetics_app/backend';
+      // Connect physical Android phones directly to PC's local Wi-Fi IP
+      return defaultLocalIp;
     }
-    return 'http://localhost/diabetics_app/backend';
+    return 'localhost';
   }
+
+  // Base URL pointing to XAMPP PHP backend
+  static String get baseUrl => 'http://$serverHost/diabetics_app/backend';
 
   // Auth Endpoints
   static String get sendOtp => '$baseUrl/auth/send_otp.php';

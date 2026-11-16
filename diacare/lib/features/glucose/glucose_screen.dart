@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../core/constants/colors.dart';
 import '../../providers/glucose_provider.dart';
-import '../../models/glucose_model.dart';
 import '../../widgets/glucose_badge.dart';
 
 class GlucoseScreen extends StatefulWidget {
@@ -100,6 +99,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                     onPressed: () async {
                       final val = double.tryParse(valController.text);
                       if (val == null || val <= 0) return;
+                      final messenger = ScaffoldMessenger.of(context);
                       Navigator.pop(ctx);
 
                       await glucose.addReading(
@@ -109,11 +109,10 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                         measuredAt: selectedDateTime,
                         notes: notesController.text.trim(),
                       );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Reading saved successfully'), backgroundColor: AppColors.success),
-                        );
-                      }
+                      if (!mounted) return;
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Reading saved successfully'), backgroundColor: AppColors.success),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
@@ -310,7 +309,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
                 const SizedBox(height: 60),
               ],
@@ -404,7 +403,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: (isDark ? AppColors.borderDark : AppColors.borderLight).withOpacity(0.5),
+                    color: (isDark ? AppColors.borderDark : AppColors.borderLight).withValues(alpha: 0.5),
                     strokeWidth: 1,
                   ),
                 ),
@@ -423,7 +422,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                     dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: AppColors.primary.withOpacity(0.12),
+                      color: AppColors.primary.withValues(alpha: 0.12),
                     ),
                   ),
                 ],

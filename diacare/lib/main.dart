@@ -10,9 +10,11 @@ import 'providers/medication_provider.dart';
 import 'providers/activity_provider.dart';
 import 'providers/chat_provider.dart';
 import 'features/auth/splash_screen.dart';
+import 'services/api_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiService.initHost();
   runApp(
     MultiProvider(
       providers: [

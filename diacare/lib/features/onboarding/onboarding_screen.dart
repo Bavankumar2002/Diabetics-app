@@ -83,7 +83,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _medNameController = TextEditingController(text: 'Metformin');
   final _medDosageController = TextEditingController(text: '500 mg');
   bool _usesInsulin = false;
-  String _medSchedule = '08:00 AM (After Breakfast)';
+  final String _medSchedule = '08:00 AM (After Breakfast)';
   // Page 13: Food Preferences
   String _foodPreference = 'Vegetarian';
   final List<String> _foodPreferences = ['Vegetarian', 'Non-vegetarian', 'Vegan', 'Eggetarian'];
@@ -428,7 +428,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight.withOpacity(0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
+                color: isSelected ? AppColors.primaryLight.withValues(alpha: 0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : (isDark ? AppColors.borderDark : AppColors.borderLight),
@@ -499,7 +499,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight.withOpacity(0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
+                color: isSelected ? AppColors.primaryLight.withValues(alpha: 0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : (isDark ? AppColors.borderDark : AppColors.borderLight),
@@ -521,7 +521,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -541,7 +541,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight.withOpacity(0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
+                color: isSelected ? AppColors.primaryLight.withValues(alpha: 0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : (isDark ? AppColors.borderDark : AppColors.borderLight),
@@ -555,7 +555,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onTap: () => setState(() => _activityLevel = shortName),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -706,7 +706,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight.withOpacity(0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
+                color: isSelected ? AppColors.primaryLight.withValues(alpha: 0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : (isDark ? AppColors.borderDark : AppColors.borderLight),
@@ -719,7 +719,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onTap: () => setState(() => _diabetesType = type),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -747,7 +747,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             title: const Text('Family history of diabetes?', style: TextStyle(fontWeight: FontWeight.w600)),
             subtitle: const Text('Parent, sibling, or grandparent with diabetes'),
             value: _familyHistory,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
             onChanged: (val) => setState(() => _familyHistory = val),
           ),
           const SizedBox(height: 12),
@@ -806,7 +806,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           SwitchListTile(
             title: const Text('Are you currently taking diabetes medication?', style: TextStyle(fontWeight: FontWeight.w600)),
             value: _takesMedication,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
             onChanged: (val) => setState(() => _takesMedication = val),
           ),
           if (_takesMedication) ...[
@@ -824,7 +824,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             SwitchListTile(
               title: const Text('Do you use Insulin injections?', style: TextStyle(fontWeight: FontWeight.w600)),
               value: _usesInsulin,
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
               onChanged: (val) => setState(() => _usesInsulin = val),
             ),
           ],
@@ -846,7 +846,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight.withOpacity(0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
+                color: isSelected ? AppColors.primaryLight.withValues(alpha: 0.4) : (isDark ? AppColors.surfaceDark : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : (isDark ? AppColors.borderDark : AppColors.borderLight),
@@ -859,7 +859,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onTap: () => setState(() => _foodPreference = pref),
               ),
             );
-          }).toList(),
+          }),
           const SizedBox(height: 14),
           TextFormField(
             controller: _allergiesController,

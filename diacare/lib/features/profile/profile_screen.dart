@@ -277,7 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   secondary: const Icon(Icons.dark_mode_rounded, color: AppColors.primary),
                   title: const Text('Dark Mode Theme', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   value: theme.isDarkMode,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) => theme.toggleTheme(),
                 ),
               ], isDark),

@@ -104,9 +104,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     onPressed: () async {
                       final val = double.tryParse(valController.text);
                       if (val == null || val <= 0) return;
+                      final dashProvider = Provider.of<DashboardProvider>(context, listen: false);
+                      final glucProvider = Provider.of<GlucoseProvider>(context, listen: false);
+                      final messenger = ScaffoldMessenger.of(context);
                       Navigator.pop(ctx);
 
-                      final glucProvider = Provider.of<GlucoseProvider>(context, listen: false);
                       await glucProvider.addReading(
                         readingValue: val,
                         mealType: mealType,
@@ -114,12 +116,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         measuredAt: DateTime.now(),
                         notes: notesController.text.trim(),
                       );
-                      if (mounted) {
-                        Provider.of<DashboardProvider>(context, listen: false).fetchSummary();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Blood glucose logged successfully'), backgroundColor: AppColors.success),
-                        );
-                      }
+                      if (!mounted) return;
+                      dashProvider.fetchSummary();
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Blood glucose logged successfully'), backgroundColor: AppColors.success),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
@@ -281,7 +282,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.waterColor.withOpacity(0.15),
+                              color: AppColors.waterColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text('+250ml', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.waterColor)),
@@ -337,9 +338,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -356,8 +357,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final status = gluc['status'] ?? 'Normal';
     final targetMin = gluc['target_min'] ?? 70;
     final targetMax = gluc['target_max'] ?? 140;
-    final val = latestGluc != null ? latestGluc['reading_value'] : '--';
-    final meal = latestGluc != null ? latestGluc['meal_type'] : 'No readings today';
+    final rawVal = latestGluc != null ? latestGluc['reading_value'] : null;
+    final String val;
+    if (rawVal == null) {
+      val = '--';
+    } else if (rawVal is num) {
+      val = rawVal % 1 == 0 ? rawVal.toInt().toString() : rawVal.toString();
+    } else {
+      final parsed = double.tryParse(rawVal.toString());
+      if (parsed != null) {
+        val = parsed % 1 == 0 ? parsed.toInt().toString() : parsed.toString();
+      } else {
+        val = rawVal.toString();
+      }
+    }
+    final meal = latestGluc != null ? latestGluc['meal_type']?.toString() ?? 'No readings' : 'No readings today';
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -367,7 +381,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -384,7 +398,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.danger.withOpacity(0.12),
+                      color: AppColors.danger.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.bloodtype_rounded, color: AppColors.danger, size: 20),
@@ -398,22 +412,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 16),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '$val',
-                style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: AppColors.primary),
+                val,
+                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: AppColors.primary),
               ),
-              const SizedBox(width: 6),
-              const Text('mg/dL', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondaryLight)),
-              const Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(meal, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                  Text('Target: $targetMin - $targetMax mg/dL', style: const TextStyle(fontSize: 11, color: AppColors.textMutedLight)),
-                ],
+              const SizedBox(width: 4),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Text('mg/dL', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondaryLight)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      meal,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'Target: $targetMin - $targetMax mg/dL',
+                      style: const TextStyle(fontSize: 11, color: AppColors.textMutedLight),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -473,7 +501,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -490,7 +518,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.caloriesColor.withOpacity(0.12),
+                      color: AppColors.caloriesColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.local_fire_department_rounded, color: AppColors.caloriesColor, size: 20),
@@ -524,15 +552,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   consumed: (prot['consumed'] ?? 0).toDouble(),
                   goal: (prot['goal'] ?? 80).toDouble(),
                   progressColor: AppColors.proteinColor,
+                  isCompact: true,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: NutrientProgressBar(
                   label: 'Carbohydrates',
                   consumed: (carbs['consumed'] ?? 0).toDouble(),
                   goal: (carbs['goal'] ?? 180).toDouble(),
                   progressColor: AppColors.carbsColor,
+                  isCompact: true,
                 ),
               ),
             ],
@@ -545,15 +575,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   consumed: (fat['consumed'] ?? 0).toDouble(),
                   goal: (fat['goal'] ?? 60).toDouble(),
                   progressColor: AppColors.fatColor,
+                  isCompact: true,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: NutrientProgressBar(
                   label: 'Dietary Fibre',
                   consumed: (fib['consumed'] ?? 0).toDouble(),
                   goal: (fib['goal'] ?? 30).toDouble(),
                   progressColor: AppColors.fiberColor,
+                  isCompact: true,
                 ),
               ),
             ],
@@ -582,7 +614,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.purple.withOpacity(0.12),
+                      color: AppColors.purple.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.medication_rounded, color: AppColors.purple, size: 20),
@@ -650,7 +682,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -661,7 +693,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 28),

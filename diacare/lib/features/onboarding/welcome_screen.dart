@@ -20,7 +20,7 @@ class WelcomeScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.primaryLight.withOpacity(0.6),
+              AppColors.primaryLight.withValues(alpha: 0.6),
               isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
             ],
           ),
@@ -41,7 +41,7 @@ class WelcomeScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.4),
+                        color: AppColors.primary.withValues(alpha: 0.4),
                         blurRadius: 28,
                         offset: const Offset(0, 10),
                       ),
@@ -87,7 +87,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

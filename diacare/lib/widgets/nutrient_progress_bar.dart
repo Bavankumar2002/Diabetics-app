@@ -7,6 +7,7 @@ class NutrientProgressBar extends StatelessWidget {
   final double goal;
   final String unit;
   final Color progressColor;
+  final bool isCompact;
 
   const NutrientProgressBar({
     super.key,
@@ -15,6 +16,7 @@ class NutrientProgressBar extends StatelessWidget {
     required this.goal,
     this.unit = 'g',
     required this.progressColor,
+    this.isCompact = false,
   });
 
   @override
@@ -23,26 +25,35 @@ class NutrientProgressBar extends StatelessWidget {
     final ratio = goal > 0 ? (consumed / goal).clamp(0.0, 1.0) : 0.0;
     final percentage = (ratio * 100).round();
 
+    final valueText = isCompact
+        ? '${consumed.toStringAsFixed(consumed % 1 == 0 ? 0 : 1)}/${goal.toStringAsFixed(0)} $unit'
+        : '${consumed.toStringAsFixed(1)} / ${goal.toStringAsFixed(0)} $unit ($percentage%)';
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: isCompact ? 12 : 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                  ),
                 ),
               ),
+              const SizedBox(width: 4),
               Text(
-                '${consumed.toStringAsFixed(1)} / ${goal.toStringAsFixed(0)} $unit ($percentage%)',
+                valueText,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: isCompact ? 11 : 12,
                   fontWeight: FontWeight.w500,
                   color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                 ),
@@ -54,7 +65,7 @@ class NutrientProgressBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: ratio,
-              minHeight: 8,
+              minHeight: isCompact ? 6 : 8,
               backgroundColor: isDark ? AppColors.borderDark : AppColors.borderLight,
               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
             ),

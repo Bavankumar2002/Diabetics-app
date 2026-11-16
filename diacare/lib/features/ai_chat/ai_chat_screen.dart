@@ -111,7 +111,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
             // Clinical Disclaimer Banner
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              color: AppColors.warning.withOpacity(0.12),
+              color: AppColors.warning.withValues(alpha: 0.12),
               child: const Row(
                 children: [
                   Icon(Icons.shield_outlined, size: 16, color: Color(0xFFD97706)),
@@ -278,7 +278,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                 color: isUser
                     ? AppColors.primary
                     : (isEmerg
-                        ? AppColors.danger.withOpacity(0.12)
+                        ? AppColors.danger.withValues(alpha: 0.12)
                         : (isDark ? AppColors.cardDark : Colors.white)),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
@@ -290,7 +290,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     ? null
                     : Border.all(
                         color: isEmerg
-                            ? AppColors.danger.withOpacity(0.5)
+                            ? AppColors.danger.withValues(alpha: 0.5)
                             : (isDark ? AppColors.borderDark : AppColors.borderLight),
                       ),
               ),
@@ -328,7 +328,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
               padding: const EdgeInsets.all(6),
               margin: const EdgeInsets.only(top: 4),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.2),
+                color: AppColors.secondary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.person, color: AppColors.secondary, size: 16),

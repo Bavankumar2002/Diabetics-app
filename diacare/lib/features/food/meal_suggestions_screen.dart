@@ -40,9 +40,9 @@ class _MealSuggestionsScreenState extends State<MealSuggestionsScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight.withOpacity(0.5),
+                  color: AppColors.primaryLight.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +158,7 @@ class _MealSuggestionsScreenState extends State<MealSuggestionsScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppColors.caloriesColor.withOpacity(0.12),
+                          color: AppColors.caloriesColor.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -191,6 +191,7 @@ class _MealSuggestionsScreenState extends State<MealSuggestionsScreen> {
                       icon: const Icon(Icons.add_circle_outline, size: 16),
                       label: Text('Log this for $slotName', style: const TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: () async {
+                        final messenger = ScaffoldMessenger.of(context);
                         final foodProvider = Provider.of<FoodProvider>(context, listen: false);
                         await foodProvider.logFoodItem(
                           mealTime: slotName,
@@ -203,11 +204,10 @@ class _MealSuggestionsScreenState extends State<MealSuggestionsScreen> {
                           fat: food.fat,
                           fiber: food.fiber,
                         );
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Added ${food.name} to $slotName!'), backgroundColor: AppColors.success),
-                          );
-                        }
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(content: Text('Added ${food.name} to $slotName!'), backgroundColor: AppColors.success),
+                        );
                       },
                     ),
                   ),
@@ -215,7 +215,7 @@ class _MealSuggestionsScreenState extends State<MealSuggestionsScreen> {
               ),
             ),
           );
-        }).toList(),
+        }),
         const SizedBox(height: 16),
       ],
     );
@@ -225,7 +225,7 @@ class _MealSuggestionsScreenState extends State<MealSuggestionsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),

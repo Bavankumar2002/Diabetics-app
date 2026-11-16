@@ -136,9 +136,9 @@ class _RemindersSetupScreenState extends State<RemindersSetupScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryLight.withOpacity(0.5),
+                        color: AppColors.primaryLight.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
@@ -176,7 +176,7 @@ class _RemindersSetupScreenState extends State<RemindersSetupScreen> {
                           ),
                           Switch(
                             value: _masterNotificationEnabled,
-                            activeColor: AppColors.primary,
+                            activeThumbColor: AppColors.primary,
                             onChanged: (val) => setState(() => _masterNotificationEnabled = val),
                           ),
                         ],
@@ -275,7 +275,7 @@ class _RemindersSetupScreenState extends State<RemindersSetupScreen> {
                             ),
                             Switch(
                               value: item['enabled'] == true,
-                              activeColor: AppColors.primary,
+                              activeThumbColor: AppColors.primary,
                               onChanged: _masterNotificationEnabled
                                   ? (val) => setState(() => item['enabled'] = val)
                                   : null,
