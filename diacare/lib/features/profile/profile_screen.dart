@@ -328,21 +328,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSectionCard(String title, List<Widget> children, bool isDark) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.cardDark : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          ...children,
-        ],
+    return Material(
+      color: isDark ? AppColors.cardDark : Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            ...children,
+          ],
+        ),
       ),
     );
   }

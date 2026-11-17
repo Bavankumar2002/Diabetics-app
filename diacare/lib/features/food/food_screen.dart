@@ -237,6 +237,12 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
     );
   }
 
+  double _toDouble(dynamic val, [double fallback = 0.0]) {
+    if (val == null) return fallback;
+    if (val is num) return val.toDouble();
+    return double.tryParse(val.toString()) ?? fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
     final food = Provider.of<FoodProvider>(context);
@@ -262,7 +268,7 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
             // Daily Macro Overview Card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.cardDark : Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -273,24 +279,29 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Today's Nutrition Intake", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                      OutlinedButton.icon(
-                        icon: const Icon(Icons.tips_and_updates_rounded, size: 14),
-                        label: const Text('Suggestions', style: TextStyle(fontSize: 12)),
-                        style: OutlinedButton.styleFrom(visualDensity: VisualDensity.compact),
-                        onPressed: () {
+                      const Text("Today's Nutrition Intake", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      InkWell(
+                        onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const MealSuggestionsScreen()));
                         },
+                        child: const Row(
+                          children: [
+                            Icon(Icons.tips_and_updates_rounded, size: 14, color: AppColors.primary),
+                            SizedBox(width: 4),
+                            Text('Suggestions', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary)),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   NutrientProgressBar(
                     label: 'Calories',
-                    consumed: (totals['calories'] ?? 0).toDouble(),
-                    goal: (totals['calorie_goal'] ?? 1800).toDouble(),
+                    consumed: _toDouble(totals['calories']),
+                    goal: _toDouble(totals['calorie_goal'], 1800),
                     unit: 'kcal',
                     progressColor: AppColors.caloriesColor,
+                    isCompact: true,
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -298,8 +309,8 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                       Expanded(
                         child: NutrientProgressBar(
                           label: 'Protein',
-                          consumed: (totals['protein'] ?? 0).toDouble(),
-                          goal: (totals['protein_goal'] ?? 80).toDouble(),
+                          consumed: _toDouble(totals['protein']),
+                          goal: _toDouble(totals['protein_goal'], 80),
                           progressColor: AppColors.proteinColor,
                           isCompact: true,
                         ),
@@ -308,8 +319,8 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                       Expanded(
                         child: NutrientProgressBar(
                           label: 'Carbohydrates',
-                          consumed: (totals['carbs'] ?? 0).toDouble(),
-                          goal: (totals['carbs_goal'] ?? 180).toDouble(),
+                          consumed: _toDouble(totals['carbs']),
+                          goal: _toDouble(totals['carbs_goal'], 180),
                           progressColor: AppColors.carbsColor,
                           isCompact: true,
                         ),
@@ -321,8 +332,8 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                       Expanded(
                         child: NutrientProgressBar(
                           label: 'Fats',
-                          consumed: (totals['fat'] ?? 0).toDouble(),
-                          goal: (totals['fat_goal'] ?? 60).toDouble(),
+                          consumed: _toDouble(totals['fat']),
+                          goal: _toDouble(totals['fat_goal'], 60),
                           progressColor: AppColors.fatColor,
                           isCompact: true,
                         ),
@@ -331,8 +342,8 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                       Expanded(
                         child: NutrientProgressBar(
                           label: 'Fibre',
-                          consumed: (totals['fiber'] ?? 0).toDouble(),
-                          goal: (totals['fiber_goal'] ?? 30).toDouble(),
+                          consumed: _toDouble(totals['fiber']),
+                          goal: _toDouble(totals['fiber_goal'], 30),
                           progressColor: AppColors.fiberColor,
                           isCompact: true,
                         ),
@@ -388,18 +399,23 @@ class _FoodScreenState extends State<FoodScreen> with SingleTickerProviderStateM
                         Expanded(
                           child: items.isEmpty
                               ? Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.restaurant_outlined, size: 48, color: AppColors.textMutedLight.withValues(alpha: 0.5)),
-                                      const SizedBox(height: 12),
-                                      Text('No food logged for $slot yet.', style: const TextStyle(color: AppColors.textMutedLight)),
-                                      const SizedBox(height: 8),
-                                      TextButton(
-                                        onPressed: () => _showAddFoodModal(slot),
-                                        child: Text('+ Add $slot item', style: const TextStyle(fontWeight: FontWeight.bold)),
-                                      ),
-                                    ],
+                                  child: SingleChildScrollView(
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.restaurant_outlined, size: 44, color: AppColors.textMutedLight.withValues(alpha: 0.5)),
+                                        const SizedBox(height: 8),
+                                        Text('No food logged for $slot yet.', style: const TextStyle(color: AppColors.textMutedLight, fontSize: 13)),
+                                        const SizedBox(height: 6),
+                                        TextButton.icon(
+                                          icon: const Icon(Icons.add, size: 16),
+                                          label: Text('Add $slot item', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                          onPressed: () => _showAddFoodModal(slot),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 )
                               : ListView.builder(

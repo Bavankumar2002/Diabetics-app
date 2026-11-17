@@ -196,37 +196,44 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                     border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _statItem(
-                        'Average',
-                        isMmol
-                            ? '${((stats['average'] ?? 0) / 18.0182).toStringAsFixed(1)}'
-                            : '${stats['average'] ?? 0}',
-                        gluc.selectedUnit,
-                        AppColors.primary,
+                      Expanded(
+                        child: _statItem(
+                          'Average',
+                          isMmol
+                              ? '${((stats['average'] ?? 0) / 18.0182).toStringAsFixed(1)}'
+                              : '${stats['average'] ?? 0}',
+                          gluc.selectedUnit,
+                          AppColors.primary,
+                        ),
                       ),
-                      _statItem(
-                        'In Target',
-                        '${stats['in_range_percentage'] ?? 0}%',
-                        '${stats['in_range_count'] ?? 0} tests',
-                        AppColors.success,
+                      Expanded(
+                        child: _statItem(
+                          'In Target',
+                          '${stats['in_range_percentage'] ?? 0}%',
+                          '${stats['in_range_count'] ?? 0} tests',
+                          AppColors.success,
+                        ),
                       ),
-                      _statItem(
-                        'Highest',
-                        isMmol
-                            ? '${((stats['highest'] ?? 0) / 18.0182).toStringAsFixed(1)}'
-                            : '${stats['highest'] ?? 0}',
-                        gluc.selectedUnit,
-                        AppColors.danger,
+                      Expanded(
+                        child: _statItem(
+                          'Highest',
+                          isMmol
+                              ? '${((stats['highest'] ?? 0) / 18.0182).toStringAsFixed(1)}'
+                              : '${stats['highest'] ?? 0}',
+                          gluc.selectedUnit,
+                          AppColors.danger,
+                        ),
                       ),
-                      _statItem(
-                        'Lowest',
-                        isMmol
-                            ? '${((stats['lowest'] ?? 0) / 18.0182).toStringAsFixed(1)}'
-                            : '${stats['lowest'] ?? 0}',
-                        gluc.selectedUnit,
-                        AppColors.warning,
+                      Expanded(
+                        child: _statItem(
+                          'Lowest',
+                          isMmol
+                              ? '${((stats['lowest'] ?? 0) / 18.0182).toStringAsFixed(1)}'
+                              : '${stats['lowest'] ?? 0}',
+                          gluc.selectedUnit,
+                          AppColors.warning,
+                        ),
                       ),
                     ],
                   ),
@@ -243,11 +250,16 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                   children: [
                     Text(
                       'Historical Records (${gluc.readings.length})',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                      'Target: ${isMmol ? (gluc.targetMin / 18.0182).toStringAsFixed(1) : gluc.targetMin.round()} - ${isMmol ? (gluc.targetMax / 18.0182).toStringAsFixed(1) : gluc.targetMax.round()} ${gluc.selectedUnit}',
-                      style: const TextStyle(fontSize: 11, color: AppColors.textMutedLight),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Target: ${isMmol ? (gluc.targetMin / 18.0182).toStringAsFixed(1) : gluc.targetMin.round()} - ${isMmol ? (gluc.targetMax / 18.0182).toStringAsFixed(1) : gluc.targetMax.round()} ${gluc.selectedUnit}',
+                        textAlign: TextAlign.end,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 11, color: AppColors.textMutedLight),
+                      ),
                     ),
                   ],
                 ),
@@ -273,6 +285,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                         leading: Container(
                           width: 44,
                           height: 44,
@@ -289,13 +302,15 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
                             ),
                           ),
                         ),
-                        title: Row(
+                        title: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 6,
+                          runSpacing: 2,
                           children: [
                             Text(
                               '$displayVal ${gluc.selectedUnit}',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(width: 8),
                             GlucoseBadge(status: r.status),
                           ],
                         ),
@@ -352,10 +367,25 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
   Widget _statItem(String label, String value, String unit, Color color) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textMutedLight)),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 11, color: AppColors.textMutedLight),
+        ),
         const SizedBox(height: 4),
-        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-        Text(unit, style: const TextStyle(fontSize: 10, color: AppColors.textSecondaryLight)),
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: color),
+        ),
+        Text(
+          unit,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 10, color: AppColors.textSecondaryLight),
+        ),
       ],
     );
   }
@@ -388,9 +418,14 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Glucose Trend Curve', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              Text(
-                'Target: 70-140 mg/dL',
-                style: TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w600),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Target: 70-140 mg/dL',
+                  textAlign: TextAlign.end,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w600),
+                ),
               ),
             ],
           ),

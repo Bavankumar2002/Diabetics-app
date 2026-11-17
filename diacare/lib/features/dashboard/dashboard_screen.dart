@@ -651,7 +651,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text('${m['name']} (${m['dosage']})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, decoration: isTaken ? TextDecoration.lineThrough : null)),
+                      child: Text(
+                        '${m['name']} (${m['dosage']})',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          decoration: isTaken ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
                     ),
                     Text(m['reminder_time'] ?? '', style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600)),
                   ],
