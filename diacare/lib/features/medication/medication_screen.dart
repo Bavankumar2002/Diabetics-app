@@ -38,107 +38,109 @@ class _MedicationScreenState extends State<MedicationScreen> {
           builder: (context, setModalState) {
             return Padding(
               padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Add Diabetes Medication', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: nameCtrl,
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Medication Name',
-                      hintText: 'e.g. Metformin / Glimepiride',
-                      prefixIcon: Icon(Icons.medication_rounded, color: AppColors.primary),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: dosageCtrl,
-                          decoration: const InputDecoration(labelText: 'Dosage', hintText: 'e.g. 500 mg'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Add Diabetes Medication', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: nameCtrl,
+                        autofocus: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Medication Name',
+                          hintText: 'e.g. Metformin / Glimepiride',
+                          prefixIcon: Icon(Icons.medication_rounded, color: AppColors.primary),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            final picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-                            if (picked != null) {
-                              final h = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
-                              final m = picked.minute.toString().padLeft(2, '0');
-                              final p = picked.period == DayPeriod.am ? 'AM' : 'PM';
-                              setModalState(() => reminderTime = '$h:$m $p');
-                            }
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(labelText: 'Reminder Time'),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(reminderTime, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                const Icon(Icons.access_time, size: 18, color: AppColors.primary),
-                              ],
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: dosageCtrl,
+                              decoration: const InputDecoration(labelText: 'Dosage', hintText: 'e.g. 500 mg'),
                             ),
                           ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () async {
+                                final picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+                                if (picked != null) {
+                                  final h = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
+                                  final m = picked.minute.toString().padLeft(2, '0');
+                                  final p = picked.period == DayPeriod.am ? 'AM' : 'PM';
+                                  setModalState(() => reminderTime = '$h:$m $p');
+                                }
+                              },
+                              child: InputDecorator(
+                                decoration: const InputDecoration(labelText: 'Reminder Time'),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(reminderTime, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    const Icon(Icons.access_time, size: 18, color: AppColors.primary),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      SwitchListTile(
+                        title: const Text('Is this an Insulin dose?', style: TextStyle(fontWeight: FontWeight.w600)),
+                        value: isInsulin,
+                        activeThumbColor: AppColors.primary,
+                        onChanged: (val) => setModalState(() => isInsulin = val),
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: instructionCtrl,
+                        decoration: const InputDecoration(labelText: 'Physician Instructions', hintText: 'e.g. Take immediately after breakfast'),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (nameCtrl.text.trim().isEmpty) return;
+                          final messenger = ScaffoldMessenger.of(context);
+                          Navigator.pop(ctx);
+                          final medProvider = Provider.of<MedicationProvider>(context, listen: false);
+                          await medProvider.addMedication(
+                            name: nameCtrl.text.trim(),
+                            dosage: dosageCtrl.text.trim(),
+                            frequency: frequency,
+                            isInsulin: isInsulin,
+                            reminderTime: reminderTime,
+                            instructions: instructionCtrl.text.trim(),
+                          );
+                          if (!mounted) return;
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Medication added successfully'), backgroundColor: AppColors.success),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
+                        child: const Text('Save Medication', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  SwitchListTile(
-                    title: const Text('Is this an Insulin dose?', style: TextStyle(fontWeight: FontWeight.w600)),
-                    value: isInsulin,
-                    activeThumbColor: AppColors.primary,
-                    onChanged: (val) => setModalState(() => isInsulin = val),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: instructionCtrl,
-                    decoration: const InputDecoration(labelText: 'Physician Instructions', hintText: 'e.g. Take immediately after breakfast'),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (nameCtrl.text.trim().isEmpty) return;
-                      final messenger = ScaffoldMessenger.of(context);
-                      Navigator.pop(ctx);
-                      final medProvider = Provider.of<MedicationProvider>(context, listen: false);
-                      await medProvider.addMedication(
-                        name: nameCtrl.text.trim(),
-                        dosage: dosageCtrl.text.trim(),
-                        frequency: frequency,
-                        isInsulin: isInsulin,
-                        reminderTime: reminderTime,
-                        instructions: instructionCtrl.text.trim(),
-                      );
-                      if (!mounted) return;
-                      messenger.showSnackBar(
-                        const SnackBar(content: Text('Medication added successfully'), backgroundColor: AppColors.success),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: const Text('Save Medication', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                ],
+                ),
               ),
             );
           },

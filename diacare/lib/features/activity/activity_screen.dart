@@ -38,83 +38,85 @@ class _ActivityScreenState extends State<ActivityScreen> {
           builder: (context, setModalState) {
             return Padding(
               padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Log Physical Activity', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Wrap(
-                    spacing: 8,
-                    children: ['Walking', 'Running', 'Cycling', 'Yoga', 'Gym Workout'].map((t) {
-                      final isSel = typeCtrl.text == t;
-                      return ChoiceChip(
-                        label: Text(t),
-                        selected: isSel,
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(color: isSel ? Colors.white : Colors.black87),
-                        onSelected: (_) => setModalState(() => typeCtrl.text = t),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: stepsCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Steps Count', hintText: 'e.g. 3000'),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Log Physical Activity', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          controller: durCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Duration (mins)', hintText: 'e.g. 30'),
-                        ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        children: ['Walking', 'Running', 'Cycling', 'Yoga', 'Gym Workout'].map((t) {
+                          final isSel = typeCtrl.text == t;
+                          return ChoiceChip(
+                            label: Text(t),
+                            selected: isSel,
+                            selectedColor: AppColors.primary,
+                            labelStyle: TextStyle(color: isSel ? Colors.white : Colors.black87),
+                            onSelected: (_) => setModalState(() => typeCtrl.text = t),
+                          );
+                        }).toList(),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final messenger = ScaffoldMessenger.of(context);
-                      final steps = int.tryParse(stepsCtrl.text) ?? 0;
-                      final dur = int.tryParse(durCtrl.text) ?? 20;
-                      Navigator.pop(ctx);
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: stepsCtrl,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(labelText: 'Steps Count', hintText: 'e.g. 3000'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextFormField(
+                              controller: durCtrl,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(labelText: 'Duration (mins)', hintText: 'e.g. 30'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          final steps = int.tryParse(stepsCtrl.text) ?? 0;
+                          final dur = int.tryParse(durCtrl.text) ?? 20;
+                          Navigator.pop(ctx);
 
-                      final act = Provider.of<ActivityProvider>(context, listen: false);
-                      await act.logActivity(
-                        activityType: typeCtrl.text,
-                        steps: steps,
-                        durationMins: dur,
-                      );
-                      if (!mounted) return;
-                      messenger.showSnackBar(
-                        const SnackBar(content: Text('Activity recorded successfully'), backgroundColor: AppColors.success),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: const Text('Save Activity', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          final act = Provider.of<ActivityProvider>(context, listen: false);
+                          await act.logActivity(
+                            activityType: typeCtrl.text,
+                            steps: steps,
+                            durationMins: dur,
+                          );
+                          if (!mounted) return;
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Activity recorded successfully'), backgroundColor: AppColors.success),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Save Activity', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             );
           },

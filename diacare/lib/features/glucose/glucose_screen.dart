@@ -41,87 +41,89 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
 
             return Padding(
               padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Add Blood Glucose Reading', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Add Blood Glucose Reading', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: valController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        autofocus: true,
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                          labelText: 'Glucose Level ($unit)',
+                          hintText: unit == 'mg/dL' ? 'e.g. 115' : 'e.g. 6.4',
+                          suffixText: unit,
+                          prefixIcon: const Icon(Icons.bloodtype_rounded, color: AppColors.primary),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Measurement Type / Context:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: ['Fasting', 'Before Meal', 'After Meal', 'Bedtime', 'Random'].map((m) {
+                          final isSel = mealType == m;
+                          return ChoiceChip(
+                            label: Text(m),
+                            selected: isSel,
+                            selectedColor: AppColors.primary,
+                            labelStyle: TextStyle(color: isSel ? Colors.white : Colors.black87),
+                            onSelected: (_) => setModalState(() => mealType = m),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: notesController,
+                        decoration: const InputDecoration(
+                          labelText: 'Clinical Notes or Symptoms',
+                          hintText: 'e.g. Felt slightly dizzy, post 45min walk',
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final val = double.tryParse(valController.text);
+                          if (val == null || val <= 0) return;
+                          final messenger = ScaffoldMessenger.of(context);
+                          Navigator.pop(ctx);
+
+                          await glucose.addReading(
+                            readingValue: val,
+                            mealType: mealType,
+                            unit: unit,
+                            measuredAt: selectedDateTime,
+                            notes: notesController.text.trim(),
+                          );
+                          if (!mounted) return;
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Reading saved successfully'), backgroundColor: AppColors.success),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Save Record', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: valController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    autofocus: true,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    decoration: InputDecoration(
-                      labelText: 'Glucose Level ($unit)',
-                      hintText: unit == 'mg/dL' ? 'e.g. 115' : 'e.g. 6.4',
-                      suffixText: unit,
-                      prefixIcon: const Icon(Icons.bloodtype_rounded, color: AppColors.primary),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Measurement Type / Context:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: ['Fasting', 'Before Meal', 'After Meal', 'Bedtime', 'Random'].map((m) {
-                      final isSel = mealType == m;
-                      return ChoiceChip(
-                        label: Text(m),
-                        selected: isSel,
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(color: isSel ? Colors.white : Colors.black87),
-                        onSelected: (_) => setModalState(() => mealType = m),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: notesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Clinical Notes or Symptoms',
-                      hintText: 'e.g. Felt slightly dizzy, post 45min walk',
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final val = double.tryParse(valController.text);
-                      if (val == null || val <= 0) return;
-                      final messenger = ScaffoldMessenger.of(context);
-                      Navigator.pop(ctx);
-
-                      await glucose.addReading(
-                        readingValue: val,
-                        mealType: mealType,
-                        unit: unit,
-                        measuredAt: selectedDateTime,
-                        notes: notesController.text.trim(),
-                      );
-                      if (!mounted) return;
-                      messenger.showSnackBar(
-                        const SnackBar(content: Text('Reading saved successfully'), backgroundColor: AppColors.success),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: const Text('Save Record', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                ],
+                ),
               ),
             );
           },

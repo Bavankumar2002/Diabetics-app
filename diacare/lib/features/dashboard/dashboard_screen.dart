@@ -46,90 +46,92 @@ class _DashboardScreenState extends State<DashboardScreen> {
           builder: (context, setModalState) {
             return Padding(
               padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Log Blood Glucose', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Log Blood Glucose', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: valController,
+                        keyboardType: TextInputType.number,
+                        autofocus: true,
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        decoration: const InputDecoration(
+                          labelText: 'Glucose Reading Value',
+                          hintText: 'e.g. 115',
+                          suffixText: 'mg/dL',
+                          prefixIcon: Icon(Icons.bloodtype_rounded, color: AppColors.primary),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Measurement Timing:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: ['Fasting', 'Before Meal', 'After Meal', 'Bedtime', 'Random'].map((m) {
+                          final isSel = mealType == m;
+                          return ChoiceChip(
+                            label: Text(m),
+                            selected: isSel,
+                            selectedColor: AppColors.primary,
+                            labelStyle: TextStyle(color: isSel ? Colors.white : Colors.black87),
+                            onSelected: (_) => setModalState(() => mealType = m),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: notesController,
+                        decoration: const InputDecoration(
+                          labelText: 'Notes (optional)',
+                          hintText: 'e.g. After 30 min morning walk',
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final val = double.tryParse(valController.text);
+                          if (val == null || val <= 0) return;
+                          final dashProvider = Provider.of<DashboardProvider>(context, listen: false);
+                          final glucProvider = Provider.of<GlucoseProvider>(context, listen: false);
+                          final messenger = ScaffoldMessenger.of(context);
+                          Navigator.pop(ctx);
+
+                          await glucProvider.addReading(
+                            readingValue: val,
+                            mealType: mealType,
+                            unit: 'mg/dL',
+                            measuredAt: DateTime.now(),
+                            notes: notesController.text.trim(),
+                          );
+                          if (!mounted) return;
+                          dashProvider.fetchSummary();
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Blood glucose logged successfully'), backgroundColor: AppColors.success),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Save Reading', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: valController,
-                    keyboardType: TextInputType.number,
-                    autofocus: true,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    decoration: const InputDecoration(
-                      labelText: 'Glucose Reading Value',
-                      hintText: 'e.g. 115',
-                      suffixText: 'mg/dL',
-                      prefixIcon: Icon(Icons.bloodtype_rounded, color: AppColors.primary),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Measurement Timing:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: ['Fasting', 'Before Meal', 'After Meal', 'Bedtime', 'Random'].map((m) {
-                      final isSel = mealType == m;
-                      return ChoiceChip(
-                        label: Text(m),
-                        selected: isSel,
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(color: isSel ? Colors.white : Colors.black87),
-                        onSelected: (_) => setModalState(() => mealType = m),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: notesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Notes (optional)',
-                      hintText: 'e.g. After 30 min morning walk',
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final val = double.tryParse(valController.text);
-                      if (val == null || val <= 0) return;
-                      final dashProvider = Provider.of<DashboardProvider>(context, listen: false);
-                      final glucProvider = Provider.of<GlucoseProvider>(context, listen: false);
-                      final messenger = ScaffoldMessenger.of(context);
-                      Navigator.pop(ctx);
-
-                      await glucProvider.addReading(
-                        readingValue: val,
-                        mealType: mealType,
-                        unit: 'mg/dL',
-                        measuredAt: DateTime.now(),
-                        notes: notesController.text.trim(),
-                      );
-                      if (!mounted) return;
-                      dashProvider.fetchSummary();
-                      messenger.showSnackBar(
-                        const SnackBar(content: Text('Blood glucose logged successfully'), backgroundColor: AppColors.success),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: const Text('Save Reading', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                ],
+                ),
               ),
             );
           },

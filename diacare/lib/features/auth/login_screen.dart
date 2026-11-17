@@ -51,123 +51,125 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (context, setModalState) {
             return Padding(
               padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.dns_rounded, color: AppColors.primary),
-                          SizedBox(width: 8),
-                          Text('Backend Server Host', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const Row(
+                            children: [
+                              Icon(Icons.dns_rounded, color: AppColors.primary),
+                              SizedBox(width: 8),
+                              Text('Backend Server Host', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
                         ],
                       ),
-                      IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Ensure smartphone and PC are connected to the same Wi-Fi router. Enter your PC IP below:',
-                    style: TextStyle(fontSize: 13, color: AppColors.textMutedLight),
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: hostCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Server Host / IP',
-                      hintText: '192.168.1.49',
-                      prefixIcon: Icon(Icons.wifi_rounded, color: AppColors.primary),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ActionChip(
-                        label: const Text('192.168.1.49 (PC Wi-Fi)'),
-                        onPressed: () => setModalState(() => hostCtrl.text = '192.168.1.49'),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Ensure smartphone and PC are connected to the same Wi-Fi router. Enter your PC IP below:',
+                        style: TextStyle(fontSize: 13, color: AppColors.textMutedLight),
                       ),
-                      ActionChip(
-                        label: const Text('10.0.2.2 (Emulator)'),
-                        onPressed: () => setModalState(() => hostCtrl.text = '10.0.2.2'),
-                      ),
-                      ActionChip(
-                        label: const Text('localhost (Web)'),
-                        onPressed: () => setModalState(() => hostCtrl.text = 'localhost'),
-                      ),
-                    ],
-                  ),
-                  if (statusMsg != null) ...[
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Icon(
-                          testSuccess == true ? Icons.check_circle_rounded : Icons.error_outline_rounded,
-                          color: testSuccess == true ? AppColors.success : AppColors.danger,
-                          size: 18,
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: hostCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Server Host / IP',
+                          hintText: '192.168.1.49',
+                          prefixIcon: Icon(Icons.wifi_rounded, color: AppColors.primary),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            statusMsg!,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: testSuccess == true ? AppColors.success : AppColors.danger,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          ActionChip(
+                            label: const Text('192.168.1.49 (PC Wi-Fi)'),
+                            onPressed: () => setModalState(() => hostCtrl.text = '192.168.1.49'),
                           ),
+                          ActionChip(
+                            label: const Text('10.0.2.2 (Emulator)'),
+                            onPressed: () => setModalState(() => hostCtrl.text = '10.0.2.2'),
+                          ),
+                          ActionChip(
+                            label: const Text('localhost (Web)'),
+                            onPressed: () => setModalState(() => hostCtrl.text = 'localhost'),
+                          ),
+                        ],
+                      ),
+                      if (statusMsg != null) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Icon(
+                              testSuccess == true ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                              color: testSuccess == true ? AppColors.success : AppColors.danger,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                statusMsg!,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: testSuccess == true ? AppColors.success : AppColors.danger,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-                  ElevatedButton(
-                    onPressed: testing
-                        ? null
-                        : () async {
-                            final target = hostCtrl.text.trim();
-                            if (target.isEmpty) return;
-                            setModalState(() {
-                              testing = true;
-                              statusMsg = 'Testing connection to http://$target/diabetics_app/backend...';
-                              testSuccess = null;
-                            });
+                      const SizedBox(height: 18),
+                      ElevatedButton(
+                        onPressed: testing
+                            ? null
+                            : () async {
+                                final target = hostCtrl.text.trim();
+                                if (target.isEmpty) return;
+                                setModalState(() {
+                                  testing = true;
+                                  statusMsg = 'Testing connection to http://$target/diabetics_app/backend...';
+                                  testSuccess = null;
+                                });
 
-                            final ok = await ApiService.testConnection(target);
-                            await ApiService.saveServerHost(target);
+                                final ok = await ApiService.testConnection(target);
+                                await ApiService.saveServerHost(target);
 
-                            setModalState(() {
-                              testing = false;
-                              testSuccess = ok;
-                              statusMsg = ok
-                                  ? 'Connected successfully to backend!'
-                                  : 'Could not reach http://$target/diabetics_app/backend. Verify PC IP & Apache.';
-                            });
+                                setModalState(() {
+                                  testing = false;
+                                  testSuccess = ok;
+                                  statusMsg = ok
+                                      ? 'Connected successfully to backend!'
+                                      : 'Could not reach http://$target/diabetics_app/backend. Verify PC IP & Apache.';
+                                });
 
-                            if (ok) {
-                              Future.delayed(const Duration(milliseconds: 900), () {
-                                if (ctx.mounted) Navigator.pop(ctx);
-                              });
-                            }
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size.fromHeight(48),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: testing
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text('Save & Test Connection', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                if (ok) {
+                                  Future.delayed(const Duration(milliseconds: 900), () {
+                                    if (ctx.mounted) Navigator.pop(ctx);
+                                  });
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size.fromHeight(48),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: testing
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Text('Save & Test Connection', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             );
           },
